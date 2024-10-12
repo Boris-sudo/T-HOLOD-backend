@@ -11,7 +11,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("id", "fridge", "start_date", "end_date", "count")
+        fields = ("id", "fridge", "start_date", "end_date", "count", "name")
 
 
 class ProductCreateSetializer(serializers.Serializer):
