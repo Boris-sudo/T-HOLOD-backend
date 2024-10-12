@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework_swagger',
     'drf_yasg',
-    'corsheader',
+    'corsheaders',
 
     'fridges',
     'products'
