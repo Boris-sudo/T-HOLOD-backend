@@ -7,6 +7,7 @@ from rest_framework import permissions
 
 from fridges.views import FridgeViewSet
 from products.views import ProductViewSet
+from wishes.views import WishesViewSet
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -24,6 +25,9 @@ router.register(r'fridges', FridgeViewSet, basename="fridge")
 product_router = SimpleRouter()
 product_router.register(r'product', ProductViewSet, basename="products")
 
+wishes_router = SimpleRouter()
+wishes_router.register(r'wishes', WishesViewSet, basename='wishes')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -31,5 +35,6 @@ urlpatterns = [
     path(r'auth/', include('djoser.urls.authtoken')),
     path('', include(router.urls)),
     path('', include(product_router.urls)),
+    path('', include(wishes_router.urls)),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

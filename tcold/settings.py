@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'fridges',
-    'products'
+    'products',
+    'wishes'
 
 ]
 

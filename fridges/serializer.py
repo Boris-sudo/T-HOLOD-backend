@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 from .models import Fridge
+from wishes.models import Wishes
+from wishes.serializer import WishesSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,6 +41,11 @@ class FridgeSerializer(serializers.ModelSerializer):
 
             data['status'] = status
         
+        data['wishes'] = WishesSerializer(
+            Wishes.objects.filter(fridge=instance),
+            many = True
+        ).data
+
         return data
 
 
