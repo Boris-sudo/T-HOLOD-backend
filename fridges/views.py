@@ -60,7 +60,7 @@ class FridgeViewSet(ViewSet):
 
         fridge = check_fridge(pk)
 
-        if not fridge.members.contains(user):
+        if not fridge or not fridge.members.contains(user):
             return Response(
                 {
                     "error": "no such fridge!"
@@ -104,15 +104,17 @@ class FridgeViewSet(ViewSet):
             }, status=404)
         
         fridge = fridge.first()
+
         if fridge.owner == user:
             fridge.delete()
-            return Response({
-                "message": "deleted"
-            })
         else:
-            return Response({
-                "error": "no such fridge"
-            }, status=404)
+            fridge.admins.remove(user)
+            fridge.members.remove(user)
+        
+        return Response({
+            "message": "deleted"
+        })
+
     
     @swagger_auto_schema(operation_description="""
         Добавляет пользователя. Прнимает path параметр - id: int пользователя
