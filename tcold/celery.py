@@ -55,3 +55,5 @@ def send_mail_():
                     [user.email],
                     fail_silently=True
                 )
+
+# send_mail("Сроки годности продукта подходят к концу", f"Сроки годности продукта: подходят к концу", settings.EMAIL, ["as.voronin777@mail.ru"], fail_silently=True)

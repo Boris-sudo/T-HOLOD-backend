@@ -137,7 +137,7 @@ class FridgeViewSet(ViewSet):
     @swagger_auto_schema(operation_description="""
         Удаляет пользователя. Прнимает path параметр - id: int пользователя
     """)
-    @action(methods=["DELETE"], detail=True)
+    @action(methods=["POST"], detail=True)
     def remove_member(self, request, pk=None):
         validate = self.validate_users(request, pk)
 
@@ -186,7 +186,7 @@ class FridgeViewSet(ViewSet):
             "message": "ok"
         })
     
-    @action(methods=["DELETE"], detail=True)
+    @action(methods=["POST"], detail=True)
     def remove_admin(self, request, pk=None):
         validate = self.validate_users(request, pk)
 
