@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-j%s4^zs_&^ebuv!k8u#0)=%r3^vos$_momd@fc@&4yibzmf!l5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -90,12 +90,24 @@ WSGI_APPLICATION = 'tcold.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if not int(os.environ.get("USE_POSTGRES")):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get("DB_NAME"),
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"),
+            'HOST': os.environ.get("DB_HOST"),
+            'PORT': '',
+        }
+    }
 
 
 # Password validation
@@ -151,17 +163,19 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # Celery settings
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_BROKER_URL = f"redis://{os.environ.get("CELERY_BROKER_URL")}:6379"
+CELERY_RESULT_BACKEND = f"redis://{os.environ.get("CELERY_BROKER_URL")}:6379"
 BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 # Email
 EMAIL = os.environ.get("EMAIL")
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = os.environ.get("EMAIL_HOST")
-EMAIL_PORT = os.environ.get("EMAIL_PORT")
-EMAIL_HOST_USER = os.environ.get("EMAIL")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = False
-EMAIL_TIMEOUT = 10
+# EMAIL_HOST = os.environ.get("EMAIL_HOST")
+# EMAIL_PORT = os.environ.get("EMAIL_PORT")
+# EMAIL_HOST_USER = os.environ.get("EMAIL")
+# EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+# EMAIL_USE_TLS = False
+# EMAIL_TIMEOUT = 10
+
+TOKEN = os.environ.get("TOKEN")

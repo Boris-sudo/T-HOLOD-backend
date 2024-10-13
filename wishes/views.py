@@ -20,14 +20,14 @@ class WishesViewSet(ViewSet):
         if not title or not count:
             return Response({
                 "error": "some data is not provided" 
-            })
+            }, status=403)
         
         fridge = check_fridge(pk)
 
         if not fridge or not fridge.members.contains(user):
             return Response({
                 "error": "no such fridge" 
-            })
+            }, status=403)
         
         Wishes.objects.create(
             title = title,
@@ -45,12 +45,11 @@ class WishesViewSet(ViewSet):
         user = get_user_from_request(request)
         
         wish: Wishes = check_wishes(pk)
-        print(wish)
 
         if not wish or not wish.fridge.members.contains(user):
             return Response({
                 "error": "cannot remove wish"
-            })
+            }, status=403)
         
         wish.delete()
 

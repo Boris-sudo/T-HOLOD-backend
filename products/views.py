@@ -8,6 +8,7 @@ from fridges.models import Fridge
 from .serializers import ProductSerializer, ProductCreateSetializer
 from .models import Product
 from .utils import check_product
+from tcold.celery import push_receipts
 
 
 class ProductViewSet(ViewSet):
@@ -112,7 +113,7 @@ class ProductViewSet(ViewSet):
             ProductSerializer(instance=product).data
         )
     
-    @action(methods=["DELETE"], detail = True)
+    @action(methods=["DELETE"], detail=True)
     def clear_fridge(self, request, pk = None):
         user = get_user_from_request(request)
         fridge: Fridge = check_fridge(pk)
@@ -132,6 +133,31 @@ class ProductViewSet(ViewSet):
         for p in products:
             p.delete()
         
+        return Response({
+            "message": "ok"
+        })
+
+    @action(methods=["POST"], detail=True)
+    def push_products_from_receipt(self, request, pk = None):
+        user = get_user_from_request(request)
+        fridge = check_fridge(pk)
+
+        q = request.data.get("q")
+
+        if not q:
+            return Response({
+                "error": "query is not provided"
+            }, status=404) 
+
+        if not fridge:
+            return Response({
+                "error": "no such fridge!"
+            }, status=404)
+        
+        push_receipts.delay(
+            user.id, fridge.id, q
+        )
+
         return Response({
             "message": "ok"
         })

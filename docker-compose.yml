@@ -1,4 +1,21 @@
 services:
+  postgres: 
+    container_name: postgres_container
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: "postgresdb"
+      POSTGRES_USER: "postgres_user"
+      POSTGRES_PASSWORD: "password123"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - postgresdb-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      postgres:
+        ipv4_address: 10.5.0.4
+  
   redis:
     container_name: redis-server
     image: redis:7.2.6
@@ -9,6 +26,49 @@ services:
         SAVE: --save 60
     volumes:
       - redis-data:/data
+    
+    networks:
+      postgres:
+        ipv4_address: 10.5.0.5
+  
+  tcold:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      DEBUG: 0
+      USE_POSTGRES: 1
+      CELERY_BROKER_URL: 10.5.0.5
+      POSTGRES_DB: postgresdb
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: password123
+      DB_HOST: 10.5.0.4
+    depends_on:
+      - postgres
+      - redis
+
+  tcold_celery:
+    build: .
+    command: celery -A tcold worker --pool=solo
+    environment:
+      DEBUG: 0
+      USE_POSTGRES: 1
+      CELERY_BROKER_URL: 10.5.0.5
+      POSTGRES_DB: postgresdb
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: password123
+      DB_HOST: 10.5.0.4
+    depends_on:
+      - postgres
+      - redis
 
 volumes:
   redis-data:
+  postgresdb-data:
+
+networks:
+  postgres:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
