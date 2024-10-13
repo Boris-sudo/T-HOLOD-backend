@@ -28,3 +28,27 @@ def check_user(pk):
     
     return user.first()
 
+
+def get_or_create_user(username, password):
+    user = User.objects.filter(username="test1")
+
+    if not user:
+        user = User.objects.create(
+            username = "test1",
+            email="test1@testdomain.com"
+        )
+        user.set_password("123456")
+    else:
+        user = user.first()
+    
+    return user
+
+
+def get_token(user: User, client):
+    response = client.post("auth/token/login", {
+        "username": user.username,
+        "password": "123456"
+    })
+    token = response.data["auth_token"]
+
+    return token

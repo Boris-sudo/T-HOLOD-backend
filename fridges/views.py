@@ -211,3 +211,38 @@ class FridgeViewSet(ViewSet):
             "message": "ok"
         })
 
+    @action(methods=["POST"], detail=True)
+    def add_member_by_username(self, request, pk=None):
+        user = get_user_from_request(request)
+        username = request.data.get("username")
+        email = request.data.get("email")
+        fridge = check_fridge(pk)
+
+        if not fridge or not fridge.admins.contains(user):
+            return Response({
+                "error": "no such fridge!"
+            }, status = 404)
+
+        filter = {}
+
+        if username is not None:
+            filter["username"] = username
+        elif email is not None:
+            filter["email"] = email
+        
+        user = User.objects.filter(**filter)
+
+        if not user.exists():
+            return Response({
+                "error": "no such user!"
+            }, status = 404)
+        
+        user = user.first()
+
+        if not fridge.members.contains(user):
+            fridge.members.add(user)
+        
+        return Response({
+            "message": "ok"
+        })
+        

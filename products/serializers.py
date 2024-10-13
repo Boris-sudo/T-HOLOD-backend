@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from datetime import datetime
+from datetime import timedelta
 
 from .models import Product
 from fridges.utils import check_user, check_fridge
@@ -26,12 +28,14 @@ class ProductCreateSetializer(serializers.Serializer):
         if not user or not fridge or not fridge.members.contains(user):
             return None
         
+        end_date = datetime.now() + timedelta(days=7) if not validated_data.get('end_date') else validated_data.get('end_date')
+        
         product = Product.objects.create(
             name = validated_data['name'],
             fridge = fridge,
             user = user,
             count = validated_data['count'],
-            end_date = validated_data['end_date'],
+            end_date = end_date,
         )
 
         return product

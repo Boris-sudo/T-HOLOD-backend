@@ -9,4 +9,4 @@ class Product(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     count = models.PositiveIntegerField()
     start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True,  blank=True)
